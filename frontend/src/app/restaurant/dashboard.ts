@@ -1,6 +1,7 @@
 import { HttpClient } from '@angular/common/http';
 import { Injectable, inject, signal } from '@angular/core';
 import { Observable, tap } from 'rxjs';
+import { environment } from '../../environments/environment.prod';
 
 // --- INTERFACES FOR THE RESTAURANT DASHBOARD ---
 export interface RestaurantOrderItem {
@@ -40,7 +41,7 @@ export interface MenuItemPayload {
 })
 export class RestaurantDashboardService {
   private http = inject(HttpClient);
-  private apiUrl = 'http://localhost:8080/api';
+  private apiUrl = `${environment.apiUrl}`;;
 
   dashboardData = signal<DashboardData | null>(null);
 

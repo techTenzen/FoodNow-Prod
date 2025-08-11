@@ -2,6 +2,7 @@ import { HttpClient } from '@angular/common/http';
 import { Injectable, inject } from '@angular/core';
 import { Observable, forkJoin, tap } from 'rxjs';
 import { AdminStateService } from './state';
+import { environment } from '../../environments/environment.prod';
 
 // --- INTERFACES ---
 export interface PendingApplication {
@@ -54,7 +55,7 @@ export interface AdminDeliveryAgent {
 export class AdminService {
   private http = inject(HttpClient);
   private state = inject(AdminStateService);
-  private apiUrl = 'http://localhost:8080/api/admin';
+  private apiUrl = `${environment.apiUrl}/admin`;;
 
   // --- Fetch and Sync All Admin Data into State ---
   fetchAllData(): Observable<any> {

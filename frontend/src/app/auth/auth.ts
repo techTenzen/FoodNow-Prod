@@ -4,6 +4,7 @@ import { Router } from '@angular/router';
 import { Observable, tap } from 'rxjs';
 import { NotificationService } from '../shared/notification';
 import { parseJwt } from '../shared/jwt-utils';
+import { environment } from '../../environments/environment.prod';
 
 @Injectable({
   providedIn: 'root'
@@ -12,7 +13,7 @@ export class AuthService {
   private http = inject(HttpClient);
   private router = inject(Router);
   private notificationService = inject(NotificationService);
-  private apiUrl = 'http://localhost:8080/api/auth';
+  private apiUrl = `${environment.apiUrl}/auth`;;
 
   /**
    * Handles user login, showing loading and success/error notifications.
