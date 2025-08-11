@@ -1,0 +1,302 @@
+@if (state.activeSection() === 'overview') {
+  <app-admin-overview></app-admin-overview>
+} @else {
+  <div class="page-header">
+    <h2 class="page-title">{{ state.pageTitle() }}</h2>
+    @if (state.activeSection() === 'delivery') {
+      <button (click)="openAgentModal()" style="background:#7C3AED;color:#fff;padding:0.5rem 1.2rem;border:none;border-radius:0.5rem;cursor:pointer;">+ Add Delivery Agent</button>
+    }
+  </div>
+
+  <div class="table-card">
+    <table class="admin-table">
+      @switch (state.activeSection()) {
+        @case ('applications') {
+          <thead>
+            <tr>
+              <th>
+                <button (click)="sortData('restaurantName')" class="sort-header">
+                  Restaurant
+                  <span class="sort-indicator" [class.active]="state.sortConfig()['applications']?.column === 'restaurantName'">
+                    {{ state.sortConfig()['applications']?.direction === 'asc' ? '▲' : '▼' }}
+                  </span>
+                </button>
+              </th>
+              <th>Applicant</th>
+              <th>Contact</th>
+              <th>Actions</th>
+            </tr>
+          </thead>
+          <tbody>
+            @for(app of sortedApplications(); track app.id) {
+              <tr>
+                <td>{{ app.restaurantName }}</td>
+                <td>{{ app.applicant?.name }} ({{ app.applicant?.email }})</td>
+                <td>{{ app.phoneNumber }}</td>
+                <td>
+                  <div class="action-buttons">
+                    <button (click)="approve(app)" class="btn-sm btn-success">Approve</button>
+                    <button (click)="reject(app)" class="btn-sm btn-danger">Reject</button>
+                  </div>
+                </td>
+              </tr>
+            } @empty {
+              <tr><td colspan="4" class="empty-state">No pending applications.</td></tr>
+            }
+          </tbody>
+        }
+
+        @case ('restaurants') {
+          <thead>
+            <tr>
+              <th>
+                <button (click)="sortData('id')" class="sort-header">ID
+                  <span class="sort-indicator" [class.active]="state.sortConfig()['restaurants']?.column === 'id'">
+                    {{ state.sortConfig()['restaurants']?.direction === 'asc' ? '▲' : '▼' }}
+                  </span>
+                </button>
+              </th>
+              <th>
+                <button (click)="sortData('name')" class="sort-header">Name
+                  <span class="sort-indicator" [class.active]="state.sortConfig()['restaurants']?.column === 'name'">
+                    {{ state.sortConfig()['restaurants']?.direction === 'asc' ? '▲' : '▼' }}
+                  </span>
+                </button>
+              </th>
+              <th>Address</th>
+              <th>Owner</th>
+            </tr>
+          </thead>
+          <tbody>
+            @for(item of sortedRestaurants(); track item.id) {
+              <tr>
+                <td>{{ item.id }}</td>
+                <td>{{ item.name }}</td>
+                <td>{{ item.address }}</td>
+                <td>{{ item.ownerName }}</td>
+              </tr>
+            } @empty {
+              <tr><td colspan="4" class="empty-state">No restaurants found.</td></tr>
+            }
+          </tbody>
+        }
+
+        @case ('users') {
+          <thead>
+            <tr>
+              <th>
+                <button (click)="sortData('id')" class="sort-header">ID
+                  <span class="sort-indicator" [class.active]="state.sortConfig()['users']?.column === 'id'">
+                    {{ state.sortConfig()['users']?.direction === 'asc' ? '▲' : '▼' }}
+                  </span>
+                </button>
+              </th>
+              <th>
+                <button (click)="sortData('name')" class="sort-header">Name
+                  <span class="sort-indicator" [class.active]="state.sortConfig()['users']?.column === 'name'">
+                    {{ state.sortConfig()['users']?.direction === 'asc' ? '▲' : '▼' }}
+                  </span>
+                </button>
+              </th>
+              <th>Email</th>
+              <th>Phone</th>
+              <th>Role</th>
+            </tr>
+          </thead>
+          <tbody>
+            @for(user of sortedUsers(); track user.id) {
+              <tr>
+                <td>{{ user.id }}</td>
+                <td>{{ user.name }}</td>
+                <td>{{ user.email }}</td>
+                <td>{{ user.phoneNumber }}</td>
+                <td>{{ user.role }}</td>
+              </tr>
+            } @empty {
+              <tr><td colspan="5" class="empty-state">No users found.</td></tr>
+            }
+          </tbody>
+        }
+
+        @case ('orders') {
+          <thead>
+            <tr>
+              <th>ID</th>
+              <th>Customer</th>
+              <th>Restaurant</th>
+              <th>Total</th>
+              <th>Status</th>
+              <th>Time</th>
+            </tr>
+          </thead>
+          <tbody>
+            @for(order of sortedOrders(); track order.id) {
+              <tr>
+                <td>#{{ order.id }}</td>
+                <td>{{ order.customerName }}</td>
+                <td>{{ order.restaurantName }}</td>
+                <td>₹{{ order.totalPrice.toFixed(2) }}</td>
+                <td>{{ order.status }}</td>
+                <td>{{ order.orderTime | date:'short' }}</td>
+              </tr>
+            } @empty {
+              <tr><td colspan="6" class="empty-state">No orders found.</td></tr>
+            }
+          </tbody>
+        }
+
+        @case ('delivery') {
+          <thead>
+            <tr>
+              <th>ID</th>
+              <th>Name</th>
+              <th>Email</th>
+              <th>Phone</th>
+            </tr>
+          </thead>
+          <tbody>
+            @for(agent of sortedDeliveryAgents(); track agent.id) {
+              <tr>
+                <td>{{ agent.id }}</td>
+                <td>{{ agent.name }}</td>
+                <td>{{ agent.email }}</td>
+                <td>{{ agent.phoneNumber }}</td>
+              </tr>
+            } @empty {
+              <tr><td colspan="4" class="empty-state">No delivery agents found.</td></tr>
+            }
+          </tbody>
+        }
+      }
+    </table>
+  </div>
+}
+
+<!-- Add Agent Modal -->
+@if(isAgentModalOpen()) {
+  <div 
+    (click)="closeAgentModal()" 
+    style="position: fixed; inset: 0; background-color: rgba(0,0,0,0.8); backdrop-filter: blur(4px); display: flex; align-items: center; justify-content: center; z-index: 2000;"
+  >
+    <div 
+      (click)="$event.stopPropagation()" 
+      style="width: 100%; max-width: 500px; background-color: #121212; border-radius: 0.75rem; border: 1px solid #333; color: #fff;"
+    >
+      <div 
+        style="display: flex; justify-content: space-between; align-items: center; padding: 1rem 1.5rem; border-bottom: 1px solid #333;"
+      >
+        <h3 style="font-size: 1.25rem; font-weight: 600;">Add New Delivery Agent</h3>
+        <button 
+          (click)="closeAgentModal()" 
+          style="background: none; border: none; font-size: 1.5rem; cursor: pointer; color: #bbb;"
+        >
+          &times;
+        </button>
+      </div>
+
+      <form 
+        #agentForm="ngForm"
+        (ngSubmit)="onAddAgentSubmit()" 
+        style="padding: 1.5rem;"
+        novalidate
+      >
+        <div style="display: grid; gap: 1rem;">
+          <!-- Name -->
+          <div>
+            <label style="display: block; margin-bottom: 0.5rem; color: #ddd;">Name</label>
+            <input 
+              type="text" 
+              name="name" 
+              required 
+              [(ngModel)]="newAgentForm.name" 
+              #name="ngModel"
+              pattern="^[A-Za-z\s]+$" 
+              style="width: 100%; padding: 0.5rem; border-radius: 0.375rem; border: 1px solid #333; background-color: #1e1e1e; color: #fff;" 
+            />
+            <div *ngIf="name.invalid && (name.dirty || name.touched)" style="color: #f87171; font-size: 0.875rem; margin-top: 0.25rem;">
+              <div *ngIf="name.errors?.['required']">Name is required.</div>
+              <div *ngIf="name.errors?.['pattern']">Name can contain letters and spaces only.</div>
+            </div>
+          </div>
+
+          <!-- Email -->
+          <div>
+            <label style="display: block; margin-bottom: 0.5rem; color: #ddd;">Email</label>
+            <input 
+              type="email" 
+              name="email" 
+              required 
+              [(ngModel)]="newAgentForm.email" 
+              #email="ngModel"
+              style="width: 100%; padding: 0.5rem; border-radius: 0.375rem; border: 1px solid #333; background-color: #1e1e1e; color: #fff;" 
+            />
+            <div *ngIf="email.invalid && (email.dirty || email.touched)" style="color: #f87171; font-size: 0.875rem; margin-top: 0.25rem;">
+              <div *ngIf="email.errors?.['required']">Email is required.</div>
+              <div *ngIf="email.errors?.['email']">Enter a valid email address.</div>
+            </div>
+          </div>
+
+          <!-- Phone Number -->
+          <div>
+            <label style="display: block; margin-bottom: 0.5rem; color: #ddd;">Phone Number</label>
+            <input 
+              type="text" 
+              name="phoneNumber" 
+              required 
+              [(ngModel)]="newAgentForm.phoneNumber" 
+              #phone="ngModel"
+              pattern="^[6-9][0-9]{9}$"
+              maxlength="10"
+              style="width: 100%; padding: 0.5rem; border-radius: 0.375rem; border: 1px solid #333; background-color: #1e1e1e; color: #fff;" 
+            />
+            <div *ngIf="phone.invalid && (phone.dirty || phone.touched)" style="color: #f87171; font-size: 0.875rem; margin-top: 0.25rem;">
+              <div *ngIf="phone.errors?.['required']">Phone number is required.</div>
+              <div *ngIf="phone.errors?.['pattern']">Enter a valid 10-digit phone number starting with 6, 7, 8, or 9.</div>
+            </div>
+          </div>
+
+          <!-- Password -->
+          <div>
+            <label style="display: block; margin-bottom: 0.5rem; color: #ddd;">Password</label>
+            <input 
+              type="password" 
+              name="password" 
+              required 
+              [(ngModel)]="newAgentForm.password" 
+              #password="ngModel"
+              minlength="6"
+              style="width: 100%; padding: 0.5rem; border-radius: 0.375rem; border: 1px solid #333; background-color: #1e1e1e; color: #fff;" 
+            />
+            <div *ngIf="password.invalid && (password.dirty || password.touched)" style="color: #f87171; font-size: 0.875rem; margin-top: 0.25rem;">
+              <div *ngIf="password.errors?.['required']">Password is required.</div>
+              <div *ngIf="password.errors?.['minlength']">Password must be at least 6 characters long.</div>
+            </div>
+          </div>
+        </div>
+
+        <div 
+          style="display: flex; justify-content: flex-end; gap: 1rem; padding: 1rem 1.5rem; border-top: 1px solid #333; background-color: #1a1a1a; margin-top: 1rem;"
+        >
+          <button 
+            type="button" 
+            (click)="closeAgentModal()" 
+            style="padding: 0.75rem 1.8rem; font-size: 1rem; font-weight: 600; border-radius: 8px; cursor: pointer; background: transparent; color: #ccc; border: 2px solid #333;"
+            onmouseover="this.style.background='#1e1e1e'" 
+            onmouseout="this.style.background='transparent'"
+          >
+            Cancel
+          </button>
+          <button 
+            type="submit" 
+            [disabled]="agentForm.invalid"
+            style="padding: 0.75rem 1.8rem; font-size: 1rem; font-weight: 600; border-radius: 8px; cursor: pointer; background: #7C3AED; color: white; border: none; transition: all 0.2s ease;"
+            onmouseover="if(!agentForm.invalid){this.style.background='#6D28D9'; this.style.transform='translateY(-2px)'; this.style.boxShadow='0 6px 18px rgba(124, 58, 237, 0.25)'}" 
+            onmouseout="if(!agentForm.invalid){this.style.background='#7C3AED'; this.style.transform='none'; this.style.boxShadow='none'}"
+          >
+            Create Agent
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+}

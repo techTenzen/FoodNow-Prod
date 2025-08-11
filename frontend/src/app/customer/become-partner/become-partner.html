@@ -1,0 +1,65 @@
+<main class="page-container">
+  <div class="page-header">
+    <a routerLink="/customer/dashboard" class="back-link">&larr; Back to Dashboard</a>
+    <h1 class="page-title">Become a FoodNow Partner</h1>
+  </div>
+
+  <div class="content-card">
+    @if (!showForm()) {
+      <div class="info-section">
+        <div class="info-icon">
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-1 14H9V8h2v8zm4 0h-2V8h2v8z"></path></svg>
+        </div>
+        <h2 class="info-title">Grow Your Business With Us!</h2>
+        <p class="info-subtitle">Joining FoodNow is a great opportunity to reach thousands of hungry customers in Hyderabad. Here are a few benefits:</p>
+        
+        <ul class="benefits-list">
+          <li><strong>Increased Reach:</strong> Tap into our large and growing user base.</li>
+          <li><strong>Effortless Delivery:</strong> We handle the logistics so you can focus on making great food.</li>
+          <li><strong>Marketing Support:</strong> Get featured in our app, promotions, and marketing campaigns.</li>
+          <li><strong>Valuable Insights:</strong> Access data and analytics to understand your customers.</li>
+        </ul>
+        
+        <p class="info-footer">Ready to get started? Fill out our simple application form and our team will get in touch with you shortly.</p>
+        
+        <div class="mt-8">
+          <button (click)="showForm.set(true)" class="btn-submit start-btn">
+            Start My Application
+          </button>
+        </div>
+      </div>
+    } @else {
+      <div class="form-section">
+        <h3 class="form-title">Restaurant Application Form</h3>
+        <form (ngSubmit)="onSubmit()">
+          <div class="form-grid">
+            <div class="form-field">
+              <label for="restaurantName">Restaurant Name</label>
+              <input type="text" id="restaurantName" name="restaurantName" class="form-input" placeholder="e.g., Paradise Biryani" required [(ngModel)]="applicationForm.restaurantName">
+            </div>
+            <div class="form-field">
+              <label for="restaurantPhone">Restaurant Phone Number</label>
+              <input type="tel" id="restaurantPhone" name="restaurantPhone" class="form-input" placeholder="e.g., 9876543210" required [(ngModel)]="applicationForm.restaurantPhone">
+            </div>
+            <div class="form-field full-span">
+              <label for="restaurantAddress">Full Restaurant Address</label>
+              <input type="text" id="restaurantAddress" name="restaurantAddress" class="form-input" placeholder="e.g., 1-2-3, Main Road, Hitech City" required [(ngModel)]="applicationForm.restaurantAddress">
+            </div>
+             <div class="form-field">
+              <label for="locationPin">Location Pin</label>
+              <input type="text" id="locationPin" name="locationPin" class="form-input" placeholder="e.g., 17.3850,78.4867" required [(ngModel)]="applicationForm.locationPin">
+            </div>
+            <div class="form-field">
+              <label for="restaurant-image">Restaurant Image/Logo</label>
+              <input type="file" id="restaurant-image" name="image" (change)="onFileSelected($event)" accept="image/*" class="form-input file-input">
+            </div>
+          </div>
+          <div class="form-footer">
+            <button type="button" (click)="showForm.set(false)" class="btn-secondary">Back</button>
+            <button type="submit" class="btn-submit">Submit Application</button>
+          </div>
+        </form>
+      </div>
+    }
+  </div>
+</main>

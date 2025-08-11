@@ -1,0 +1,54 @@
+<main class="page-container">
+  <!-- Page Header -->
+  <div class="page-header">
+    <h1 class="page-title">My Profile</h1>
+    <p class="page-subtitle">Manage your personal information and profile picture.</p>
+  </div>
+
+  <!-- Profile Card -->
+  <div class="profile-card">
+    @if (profile(); as p) {
+      <form (ngSubmit)="onSubmit()">
+        <!-- Avatar Section -->
+        <div class="avatar-section">
+          <img [src]="getProfileImageUrl()" alt="Profile Picture" class="avatar-image">
+          <div class="avatar-actions">
+            <label for="profile-image-upload" class="btn-secondary upload-btn">
+              <span>Change Picture</span>
+              <input type="file" id="profile-image-upload" class="hidden" (change)="onFileSelected($event)" accept="image/*">
+            </label>
+            <p class="upload-hint">JPG, GIF or PNG. 1MB max.</p>
+          </div>
+        </div>
+
+        <!-- Divider -->
+        <hr class="form-divider">
+
+        <!-- Form Fields Section -->
+        <div class="form-fields">
+          <div class="form-field">
+            <label for="profile-name">Full Name</label>
+            <input type="text" id="profile-name" name="name" class="form-input" required [(ngModel)]="p.name">
+          </div>
+          <div class="form-field">
+            <label for="profile-email">Email Address</label>
+            <input type="email" id="profile-email" name="email" class="form-input" [value]="p.email" disabled>
+          </div>
+          <div class="form-field">
+            <label for="profile-phone">Phone Number</label>
+            <input type="tel" id="profile-phone" name="phoneNumber" class="form-input" required [(ngModel)]="p.phoneNumber">
+          </div>
+        </div>
+        
+        <!-- Form Footer -->
+        <div class="form-footer">
+          <button type="submit" class="btn-submit save-btn">Save Changes</button>
+        </div>
+      </form>
+    } @else {
+      <div class="text-center p-8">
+        <p class="text-text-dark">Loading your profile...</p>
+      </div>
+    }
+  </div>
+</main>

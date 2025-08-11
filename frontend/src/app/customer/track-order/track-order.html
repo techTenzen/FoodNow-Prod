@@ -1,0 +1,59 @@
+<main class="page-container">
+  @if (order(); as currentOrder) {
+    <div class="page-header">
+      <a routerLink="/customer/orders" class="back-link">&larr; Back to My Orders</a>
+      <h1 class="page-title">Tracking Order #{{ currentOrder.id }}</h1>
+    </div>
+    
+    <div class="content-grid">
+      <!-- The new timer card replaces the old map/canvas container -->
+      <div class="timer-card">
+        @if (currentOrder.status === 'OUT_FOR_DELIVERY') {
+          <div class="timer-content">
+            <p class="timer-label">Estimated Arrival Time</p>
+            <p class="eta-display">{{ etaDisplay }}</p>
+            <div class="countdown-display">{{ countdownDisplay }}</div>
+            <p class="timer-subtext">Your order is on its way!</p>
+          </div>
+        } @else if (currentOrder.status === 'DELIVERED') {
+          <div class="timer-content delivered-state">
+            <div class="delivered-icon">✅</div>
+            <p class="delivered-title">Order Delivered</p>
+            <p class="timer-subtext">Enjoy your meal!</p>
+          </div>
+        } @else {
+          <div class="timer-content">
+            <p class="eta-display">{{ currentOrder.status.replace('_', ' ') }}</p>
+            <p class="timer-subtext">We'll let you know when it's on the way.</p>
+          </div>
+        }
+      </div>
+
+      <div class="details-card">
+        <h3 class="restaurant-name">{{ currentOrder.restaurantName }}</h3>
+        <p class="status-text">
+          Status: 
+          <span class="status-badge" [class]="'status-' + currentOrder.status.toLowerCase()">
+            {{ currentOrder.status.replace('_', ' ') }}
+          </span>
+        </p>
+        <div class="address-section">
+          <p class="font-semibold">Delivery Address:</p>
+          <p class="text-text-dark">{{ currentOrder.deliveryAddress }}</p>
+        </div>
+        <div class="items-section">
+            <p class="font-semibold">Items:</p>
+            <ul class="items-list">
+              @for (item of currentOrder.items; track $index) {
+                <li>{{ item.quantity }} x {{ item.itemName }}</li>
+              }
+            </ul>
+        </div>
+      </div>
+    </div>
+  } @else {
+    <div class="text-center p-8">
+      <p class="text-text-dark">Loading order details...</p>
+    </div>
+  }
+</main>

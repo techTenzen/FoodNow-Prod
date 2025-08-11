@@ -1,0 +1,99 @@
+<div class="page-header">
+  <h2 class="page-title">Order Management</h2>
+</div>
+
+<!-- Filter Tabs -->
+<div class="filter-tabs">
+  <button (click)="selectStatus('PENDING')" [class.active]="selectedStatus() === 'PENDING'">
+    Pending <span class="order-count">{{ orderCounts().PENDING }}</span>
+  </button>
+  <button (click)="selectStatus('PREPARING')" [class.active]="selectedStatus() === 'PREPARING'">
+    Preparing <span class="order-count">{{ orderCounts().PREPARING }}</span>
+  </button>
+  <button (click)="selectStatus('OUT_FOR_DELIVERY')" [class.active]="selectedStatus() === 'OUT_FOR_DELIVERY'">
+    Out for Delivery <span class="order-count">{{ orderCounts().OUT_FOR_DELIVERY }}</span>
+  </button>
+  <button (click)="selectStatus('DELIVERED')" [class.active]="selectedStatus() === 'DELIVERED'">
+    Delivered <span class="order-count">{{ orderCounts().DELIVERED }}</span>
+  </button>
+</div>
+
+<!-- Kitchen Prep Summary -->
+@if (kitchenPrepSummary().length > 0) {
+  <div class="prep-summary-card">
+    <h4 class="prep-summary-title">Total to Prepare</h4>
+    <div class="prep-summary-list">
+      @for(item of kitchenPrepSummary(); track item[0]) {
+        <div class="prep-item">{{ item[1] }} x {{ item[0] }}</div>
+      }
+    </div>
+  </div>
+}
+
+<!-- Orders List -->
+<div class="orders-list">
+  @for(order of filteredOrders(); track order.id) {
+    <div class="order-card" [class.urgent]="(timeSinceOrder()[order.id] || '0m').startsWith('10m')">
+      
+      <!-- Order Header -->
+      <div class="card-main">
+        <div class="card-details">
+          <p class="order-id">Order #{{ order.id }}</p>
+          <p class="customer-name">By: {{ order.customerName }}</p>
+        </div>
+        <div class="card-price">
+          <p>₹{{ order.totalPrice.toFixed(2) }}</p>
+        </div>
+        
+        <!-- Timer for Pending Orders -->
+        @if (selectedStatus() === 'PENDING') {
+          <p class="order-timer">{{ timeSinceOrder()[order.id] || '0m 0s' }}</p>
+        }
+      </div>
+
+      <!-- Order Items -->
+      <div class="card-body">
+        <ul class="items-list">
+          @for(item of order.items; track $index) {
+            <li>
+              <span class="item-quantity">{{ item.quantity }} x</span>
+              <span class="item-name">{{ item.itemName }}</span>
+            </li>
+          }
+        </ul>
+      </div>
+
+      <!-- Order Actions -->
+      @if (selectedStatus() === 'PENDING') {
+        <div class="card-actions">
+          <button (click)="acceptOrder(order)" class="action-btn accept-btn">Accept</button>
+          <button (click)="rejectOrder(order)" class="action-btn reject-btn">Reject</button>
+        </div>
+      }
+      @if (selectedStatus() === 'PREPARING') {
+        <div class="card-actions">
+          <button (click)="readyForPickup(order)" class="action-btn pickup-btn">Ready for Pickup</button>
+        </div>
+      }
+
+      <!-- Delivered Review -->
+      @if (selectedStatus() === 'DELIVERED' && order.hasReview) {
+        <div class="card-footer">
+          <p class="rating">
+            Rating: 
+            <span class="stars">
+              {{ '★'.repeat(order.reviewRating || 0) }}{{ '☆'.repeat(5 - (order.reviewRating || 0)) }}
+            </span>
+          </p>
+          @if(order.reviewComment) {
+            <p class="comment">"{{ order.reviewComment }}"</p>
+          }
+        </div>
+      }
+    </div>
+  } @empty {
+    <div class="empty-state">
+      No orders in this category.
+    </div>
+  }
+</div>
