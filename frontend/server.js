@@ -2,12 +2,12 @@ const express = require('express');
 const path = require('path');
 const app = express();
 
-// Serve static files from dist/frontend directory (Angular 17+ build system)
-app.use(express.static(path.join(__dirname, 'dist/frontend/browser')));
+// Serve static files from dist directory
+app.use(express.static(path.join(__dirname, 'dist/frontend')));
 
 // Handle Angular routing, return all requests to Angular app
 app.get('*', (req, res) => {
-  res.sendFile(path.join(__dirname, 'dist/frontend/browser/index.html'));
+  res.sendFile(path.join(__dirname, 'dist/frontend/index.html'));
 });
 
 // Start server
