@@ -42,42 +42,63 @@ public class SecurityConfig {
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http
-            .cors(cors -> cors.configurationSource(corsConfigurationSource())) // ✅ Enable CORS
+            .cors(cors -> cors.configurationSource(corsConfigurationSource()))
             .csrf(csrf -> csrf.disable())
             .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
             .authorizeHttpRequests(auth -> auth
+                // Public static pages
                 .requestMatchers(
                     "/", "/index.html", "/forgot-password.html", "/reset-password.html",
                     "/assets/**", "/uploads/**", "/forgot-password-confirmation.html",
                     "/customer/**", "/admin/**", "/restaurant/**", "/delivery/**"
                 ).permitAll()
+
+                // Swagger & documentation
+                .requestMatchers("/swagger-ui/**", "/swagger-ui.html", "/v3/api-docs/**").permitAll()
+
+                // Actuator and error handling
+                .requestMatchers("/actuator/**").permitAll()
+                .requestMatchers("/error").permitAll()
+
+                // Public API endpoints
                 .requestMatchers("/api/auth/**", "/api/public/**").permitAll()
+
+                // Role-based access
                 .requestMatchers("/api/admin/**").hasRole("ADMIN")
                 .requestMatchers("/api/profile/**").authenticated()
                 .requestMatchers("/api/restaurant/apply").hasRole("CUSTOMER")
-.requestMatchers(HttpMethod.POST, "/api/files/upload")
-    .hasAnyRole("CUSTOMER", "RESTAURANT_OWNER")
+                .requestMatchers(HttpMethod.POST, "/api/files/upload").hasAnyRole("CUSTOMER", "RESTAURANT_OWNER")
                 .requestMatchers("/api/restaurant/**").hasRole("RESTAURANT_OWNER")
                 .requestMatchers("/api/cart/**").hasRole("CUSTOMER")
                 .requestMatchers(HttpMethod.POST, "/api/orders/{orderId}/review").hasRole("CUSTOMER")
                 .requestMatchers("/api/orders/**").hasRole("CUSTOMER")
                 .requestMatchers("/api/delivery/**").hasRole("DELIVERY_PERSONNEL")
                 .requestMatchers("/api/manage/orders/**").hasAnyRole("ADMIN", "RESTAURANT_OWNER", "DELIVERY_PERSONNEL")
+
+                // Everything else requires authentication
                 .anyRequest().authenticated()
             );
 
         http.addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class);
-
         return http.build();
     }
 
     @Bean
     public CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration configuration = new CorsConfiguration();
-        configuration.setAllowedOrigins(Arrays.asList("http://localhost:4200")); // Angular dev origin
-        configuration.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "DELETE", "OPTIONS","PATCH"));
-        configuration.setAllowedHeaders(Arrays.asList("Authorization", "Content-Type"));
-        configuration.setAllowCredentials(true); // Needed for cookies or auth headers
+
+        // Allow local dev and Render deployment (and all origins temporarily for testing)
+        configuration.setAllowedOrigins(Arrays.asList(
+            "http://localhost:4200",
+            "https://foodnow-backend-jpac.onrender.com",
+            "*" // ⚠️ For testing only — remove in production
+        ));
+
+        configuration.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "DELETE", "OPTIONS", "PATCH"));
+        configuration.setAllowedHeaders(Arrays.asList("Authorization", "Content-Type", "*"));
+        
+        // Allow credentials only when specific origins are used, not with "*"
+        configuration.setAllowCredentials(false);
 
         UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
         source.registerCorsConfiguration("/**", configuration);
