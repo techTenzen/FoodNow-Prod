@@ -90,15 +90,14 @@ public class SecurityConfig {
         // Allow local dev and Render deployment (and all origins temporarily for testing)
         configuration.setAllowedOrigins(Arrays.asList(
             "http://localhost:4200",
-            "https://foodnow-backend-jpac.onrender.com",
-            "*" // ⚠️ For testing only — remove in production
+        "https://foodnow-prod.onrender.com"        // Your live frontend
         ));
 
         configuration.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "DELETE", "OPTIONS", "PATCH"));
         configuration.setAllowedHeaders(Arrays.asList("Authorization", "Content-Type", "*"));
         
         // Allow credentials only when specific origins are used, not with "*"
-        configuration.setAllowCredentials(false);
+        configuration.setAllowCredentials(true);
 
         UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
         source.registerCorsConfiguration("/**", configuration);
