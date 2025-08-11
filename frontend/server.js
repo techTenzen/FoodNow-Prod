@@ -7,7 +7,7 @@ app.use(express.static(path.join(__dirname, 'dist/frontend')));
 
 // Handle Angular routing, return all requests to Angular app
 app.get('*', (req, res) => {
-  res.sendFile(path.join(__dirname, 'dist/frontend/index.html'));
+  res.sendFile(path.join(__dirname, 'dist/frontend/browser/index.html'));
 });
 
 // Start server
